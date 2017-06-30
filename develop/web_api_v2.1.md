@@ -5843,6 +5843,7 @@ curl -d 'password=11111111' -H 'Authorization: Token cbd7705c06846425ed5c46ae031
 {
     "success": true
 }
+```
 
 **Errors**
 
