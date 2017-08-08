@@ -216,12 +216,18 @@
     <li>
         <a href="#multiple-files-directories">Multiple Files / Directories</a>
         <ul>
+            <li><a href="#multiple-files-directories-create">Create</a></li>
             <li><a href="#multiple-files-directories-copy">Copy</a></li>
             <li><a href="#multiple-files-directories-move">Move</a></li>
             <li><a href="#multiple-files-directories-delete">Delete</a></li>
             <li><a href="#multiple-files-directories-download">Download</a></li>
         </ul>
     </li>
+    <li>
+        TODO
+        <a href="#copy-folder-with-exact-match">Copy Folder With Exact Match</a>
+    </li>
+
     <li>
         <a href="#avatar">Avatar</a>
         <ul>
@@ -4044,6 +4050,51 @@ curl -H 'Authorization: Token ae265ae599a29c238ca25fb63087859798d5f55d' -H 'Acce
 
 ## <a id="multiple-files-directories"></a>Multiple Files / Directories
 
+
+### <a id="multiple-files-directories-create"></a>Create
+
+**POST** http://192.168.1.124:8000/api/v2.1/repos/batch-create-dir/
+
+**Request parameters**
+
+* `repo_id`
+* `paths`, path list of folders to be created.
+
+**Sample request**
+```
+curl -d '{"repo_id": "4dfdf5b6-806f-4a35-b2b7-604051d2114e", "paths": ["/1/2/a", "/3/4/b", "/5/6/"]}'  -H "Authorization: Token ae265ae599a29c238ca25fb63087859798d5f55d" -H 'Accept: application/json; indent=4' -H "Content-Type: application/json" "http://192.168.1.124:8000/api/v2.1/repos/batch-create-dir/"
+```
+
+**Sample response**
+```
+{
+    "failed": [
+        {
+            "path": "/1/2/a",
+            "repo_id": "4dfdf5b6-806f-4a35-b2b7-604051d2114e",
+            "error_msg": "Permission denied."
+        },
+        {
+            "path": "/5/6/",
+            "repo_id": "4dfdf5b6-806f-4a35-b2b7-604051d2114e",
+            "error_msg": "Folder already exists."
+        }
+    ],
+    "success": [
+        {
+            "path": "/3/4/b",
+            "repo_id": "4dfdf5b6-806f-4a35-b2b7-604051d2114e"
+        }
+    ]
+}
+```
+
+**Errors**
+
+* 404 Library not found.
+* 403 Permission denied.
+* 500 Internal Server Error
+
 ### <a id="multiple-files-directories-copy"></a>Copy
 
 **POST** https://cloud.seafile.com/api2/repos/{repo_id}/fileops/copy/
@@ -4215,6 +4266,49 @@ After the task finished, you can manually generate directory download url with t
     FILE_SERVER_ROOT/zip/{zip_token}
 
 For example, `https://cloud.seafile.com/seafhttp/zip/b2272645-35ee-44ce-8f68-07c022107015` is the final url here.
+
+## <a id="copy-folder-with-exact-match"></a>Copy Folder With Exact Match
+
+**POST** http://192.168.1.124:8000/api/v2.1/repos/batch-copy-dir/
+
+**Request parameters**
+
+* `src_repo_id`
+* `dst_repo_id`
+* `paths`
+
+**Sample request**
+```
+curl -d '{"src_repo_id":"7460f7ac-a0ff-4585-8906-bb5a57d2e118", "dst_repo_id":"a3fa768d-0f00-4343-8b8d-07b4077881db", "paths":[{"src_path":"/1/2/3/","dst_path":"/4/5/6/"},{"src_path":"/7/","dst_path":"/8/"}]}'  -H "Authorization: Token ae265ae599a29c238ca25fb63087859798d5f55d" -H 'Accept: application/json; indent=4' -H "Content-Type: application/json" "http://192.168.1.124:8000/api/v2.1/repos/batch-copy-dir/"
+```
+
+**Sample response**
+```
+{
+    "failed": [],
+    "success": [
+        {
+            "src_repo_id": "7460f7ac-a0ff-4585-8906-bb5a57d2e118",
+            "dst_path": "/4/5/6/",
+            "dst_repo_id": "a3fa768d-0f00-4343-8b8d-07b4077881db",
+            "src_path": "/1/2/3/"
+        },
+        {
+            "src_repo_id": "7460f7ac-a0ff-4585-8906-bb5a57d2e118",
+            "dst_path": "/8/",
+            "dst_repo_id": "a3fa768d-0f00-4343-8b8d-07b4077881db",
+            "src_path": "/7/"
+        }
+    ]
+}
+```
+
+**Errors**
+
+* 403 Permission denied.
+* 404 Library not found.
+* 404 Folder not found.
+* 500 Internal Server Error
 
 ## <a id="avatar"></a>Avatar
 
